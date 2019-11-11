@@ -1,0 +1,41 @@
+# depslib dependency file v1.0
+1573476999 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\main.cpp
+	"tsp.h"
+	"BnB.h"
+	<iostream>
+
+1573378326 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\src\timer.cpp
+	"Timer.h"
+	<iostream>
+	<chrono>
+	<windows.h>
+
+1573378326 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\timer.h
+	<iostream>
+	<ratio>
+	<ctime>
+	<chrono>
+
+1573478006 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\src\tsp.cpp
+	"TSP.h"
+	<iostream>
+	<fstream>
+	<vector>
+	"Timer.h"
+
+1573476169 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\tsp.h
+	<string>
+	<cstdlib>
+
+1573476009 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\src\bnb.cpp
+	"BnB.h"
+	<iostream>
+	"TSP.h"
+	<queue>
+	<vector>
+	<cstring>
+
+1573476696 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\bnb.h
+	"TSP.h"
+	<vector>
+
