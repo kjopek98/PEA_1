@@ -6,10 +6,10 @@
 class BnB : public TSP
 {
     public:
-        BnB( int **k, int r);
+        BnB( int **m, int s);
          //~BnB();
-         int rozmiar;
-         int **macierzKosztow;
+         int sizeOfMatrix;
+         int **matrixOfCost;
 
          void branchAndBound();
 

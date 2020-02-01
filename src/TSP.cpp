@@ -1,15 +1,16 @@
 #include "TSP.h"
+#include "Timer.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "Timer.h"
 
 using namespace std;
 
 TSP::TSP()
 {
-    matrixOfPerm = 0;
+    matrixOfPerm = 0; //
     int sizeOfInstance;
+    int index = 0;
 }
 
 TSP::~TSP()
@@ -22,7 +23,7 @@ int** TSP::loadOneInstance()
     string name = "";
     string instance = "";
     sizeOfInstance = 0;
-    int** matrixOfCost = 0;
+    int **matrixOfCost = 0;
     cout << "Wprowadz nazwe instancji: 'instancja'.txt" << endl;
     cin >> name;
 
@@ -30,7 +31,7 @@ int** TSP::loadOneInstance()
     ifstream data(instance.c_str());
     if(!data)
     {
-        cout << "Nie mozna otworzyc pliku!!!" << endl << endl;
+        cout << "Nie mozna otworzyc danego pliku." << endl << endl;
         return 0;
     }
 
@@ -53,7 +54,7 @@ int** TSP::loadOneInstance()
 	cout << endl;
     data.close();
 
-	cout << "Instancja zostala wczytana pomyslnie!!!" << endl << endl;
+	cout << "Instancja zostala wczytana pomyslnie." << endl << endl;
 
 	for (int i = 0; i < sizeOfInstance; i++)
     {
@@ -119,70 +120,46 @@ void TSP::loadAllInstance()
         }
         cout << endl;
     }
- //    aimFunction();
     }
 }
 
 
-
-
-int silnia(unsigned int n) // wersja rekurencyjna
+void TSP::bestPermutation(int *a, int *b, int c, int d, int &min, int size, int **matrix)
 {
-   return (n < 1) ? 1 : n * silnia(n-1);
-}
-// Generating permutation using Heap Algorithm
-void TSP::heapPermutation(int a[], int sizeOfInstance, int**& matrixOfPerm)
-{
+	int value;
+	if (c == d) {
+		value = calculateRoad(a , size, matrix);
+		if (value < min) {
+			for (int i = 0; i <= d; i++)
+				b[i] = a[i];
+			min = value;
+		}
 
-    for (int i = 0; i < sizeOfInstance; i++){
-
-        // if sizeOfInstance becomes 1 then prints the obtained
-        // permutation
-        if (sizeOfInstance == 1)
-        {
-            for(int j = 0; j < sizeOfInstance ; j++ ){
-                matrixOfPerm[i][j] = a[j];  //wstawianie permutacji do macierzy
-        }
-        }
-        else for (int i=0; i<sizeOfInstance; i++)
-        {
-            TSP::heapPermutation(a,sizeOfInstance-1, matrixOfPerm);
-
-            // if sizeOfInstance is odd, swap first and last
-            // element
-            if (sizeOfInstance%2==1)
-            swap(a[0], a[sizeOfInstance-1]);
-
-            // If sizeOfInstance is even, swap ith and last
-            // element
-            else
-            swap(a[i], a[sizeOfInstance-1]);
-        }
-    }
-    return;
+	}
+	else
+	{
+		for (int i = c; i <= d; i++)
+		{
+			swap(a[c], a[i]);
+			bestPermutation(a, b, c + 1, d, min, size,matrix);
+			swap(a[c], a[i]);
+		}
+	}
 }
 
-int TSP::travllingSalesmanProblem(int**& matrixOfCost, int**& matrixOfPerm, int sizeOfInstance )
-{
-    // store minimum weight Hamiltonian Cycle.
-    int min_path = INT_MAX;
 
-    for(int j = 0; j < silnia(sizeOfInstance)  ; j++){
+int TSP::calculateRoad(int* permut, int size, int **matrix) {
 
-
-        // store current Path weight(cost)
-        int current_pathweight = 0;
-
-        // compute current path weight
-        for (int i = 0; i < sizeOfInstance - 1; i++) {
-            current_pathweight += matrixOfCost[matrixOfPerm[j][i]][matrixOfPerm[j][i+1]] ;
-        }
-        current_pathweight += matrixOfCost[matrixOfPerm[j][sizeOfInstance-1]][matrixOfPerm[j][0]];
-
-        // update minimum
-        min_path = min(min_path, current_pathweight);
-
-    }
-    return min_path;
+	int sum = 0;
+	int i, j;
+	for (int iter = 0; iter < size - 1; iter++) {
+		i = permut[iter];
+		j = permut[iter + 1];
+		//cout << "I= " << i << " j = " << j << endl;
+		sum += matrix[i][j];
+	}
+	sum = sum + matrix[j][permut[0]];
+	return sum;
 }
+
 

@@ -35,12 +35,16 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="include/BnB.h" />
+		<Unit filename="include/DP.h" />
 		<Unit filename="include/TSP.h" />
 		<Unit filename="include/Timer.h" />
+		<Unit filename="include/menu.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/BnB.cpp" />
+		<Unit filename="src/DP.cpp" />
 		<Unit filename="src/TSP.cpp" />
 		<Unit filename="src/Timer.cpp" />
+		<Unit filename="src/menu.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

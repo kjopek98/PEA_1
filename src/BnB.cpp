@@ -3,178 +3,188 @@
 #include "TSP.h"
 #include <queue>
 #include <vector>
-#include <cstring>
 
 using namespace std;
 
-BnB::BnB(int **k, int r)
+BnB::BnB(int **m, int s)
 {
-    macierzKosztow = k;
-    rozmiar = r;
+    matrixOfCost = m;
+    sizeOfMatrix = s;
 }
-
-struct Wezel //budowa wezla
+//Struktura wezla
+struct Node
 {
-    vector<pair<int, int>> krawedz;           //przechowuje krawedzie grafu
-    int **minimalnaMacierz;                   //przechowuje zminimalizowana macierz wezla
-    int koszt;                                //przechowuje koszt wezla (lower bound)
-    int wierzcholek;                          //przechowuje wierzcholek, za ktory odpowiada wezel
-    int poziom;                               //przechowuje ilosc wczesniej odwiedzonych miast
+    vector<pair<int, int>> edge;           // krawedzie grafu
+    int **minimalMatrix;                   //zminimalizowana macierz  danego wezla
+    int cost;                                // koszt wezla (lower bound)
+    int vertex;                          //przechowuje wierzcholek, za ktory odpowiada wezel
+    int level;                               //przechowuje ilosc wczesniej odwiedzonych miast
 };
 
-struct porownanie
+struct comparision          //funktor sortujacy kolejke priorytetowa
 {
-    bool operator()(const Wezel* pierwszy, const Wezel* drugi)const
+    bool operator()(const Node* first, const Node* second)const
     {
-        return pierwszy->koszt > drugi->koszt;
+        return first->cost < second->cost;
     }
 };
 
-// tworzy nowy wezel
-Wezel* nowyWezel(int**& macierzBazowa, vector<pair<int, int>> const &krawedz, int poziom, int k, int m, int rozmiar)
+// Tworzenie nowego wezla
+Node* newNode(int**& baseMatrix, vector<pair<int, int>> const &edge, int level, int k, int m, int sizeofMatrix)
 {
-    Wezel* wezel = new Wezel;
+    // k - numer rozpatrywanego wierzcholka reprezentujacego miasto
+    // m - miasto do ktorego ma isc sciezka
+    Node* node = new Node;
+    node->edge = edge;
 
-    wezel->krawedz = krawedz;
-
-    if(poziom != 0) //jesli nie jest to wezel laczacy z glownym stworz nowa krawedz
+    if(level != 0) //jesli nie jest to wezel laczacy z glownym stworz nowa krawedz
     {
-        wezel->krawedz.push_back(make_pair(k,m));
+        node->edge.push_back(make_pair(k,m));
     }
 
-    //memcpy(wezel->minimalnaMacierz, macierzBazowa, sizeof wezel->minimalnaMacierz);
-    wezel->minimalnaMacierz = new int *[rozmiar];
-    for(int i = 0; i < rozmiar; i++)
+    node->minimalMatrix = new int *[sizeofMatrix];
+    for(int i = 0; i < sizeofMatrix; i++)
     {
-        wezel->minimalnaMacierz[i] = new int[rozmiar];
-        for(int j = 0; j < rozmiar; j++)
+        node->minimalMatrix[i] = new int[sizeofMatrix];
+        for(int j = 0; j < sizeofMatrix; j++)
         {
-            wezel->minimalnaMacierz[i][j] = macierzBazowa[i][j];
+            node->minimalMatrix[i][j] = baseMatrix[i][j];
         }
     }
 
-    if(poziom != 0) //pomijamy dla pierwszego poziomu
+    if(level != 0) //pomijanie dla pierwszego poziomu
     {
-        for(int i = 0; i < rozmiar; i++)    //wypelnniamy rzad i kolumne "-1"
+        for(int i = 0; i < sizeofMatrix; i++)    //wypelnienie rzedu i kolumny  wartosciami "-1"
         {
-            wezel->minimalnaMacierz[k][i] = -1;
-            wezel->minimalnaMacierz[i][m] = -1;
+            node->minimalMatrix[k][i] = -1;
+            node->minimalMatrix[i][m] = -1;
         }
     }
 
-    wezel->minimalnaMacierz[m][0] = -1; //ustawienie popwrotu do 0 na "-1"
-    wezel->poziom = poziom;             //ustawienie liczby odwiedzonych miast
-    wezel->wierzcholek = m;             //ustawienie aktualnie rozpatrywanego wierzcholka
+    node->minimalMatrix[m][0] = -1; //ustawienie  drogi powrotnej do wezla "0" na "-1"
+    node->level = level;             //ustawienie liczby odwiedzonych miast
+    node->vertex = m;             //ustawienie aktualnie rozpatrywanego wierzcholka
 
-    return wezel;
+    return node;
 }
-//PODAC REFERENCJE DO MACIERZY !!!!!!
-void minimalizacja(int**& minimalnaMacierz, int rzad[], int kolumna[], int rozmiar)
+void minimalization(int**& minimalMatrix, int row[], int column[], int sizeofMatrix)
 {
-    for(int i = 0; i < rozmiar; i++) //inicjalizacja rzedu macierzy wartosciami "-1"
+    for(int i = 0; i < sizeofMatrix; i++) //inicjalizacja rzedu macierzy wartosciami "-1"
     {
-        rzad[i] = -1;
-        kolumna[i] = -1;
+        row[i] = -1;
+        column[i] = -1;
     }
 
-    for(int i = 0; i < rozmiar; i++) //odnalezienie wartosci minimalnej w macierzy
+     //odnalezienie wartosci minimalnej w macierzy
+    for(int i = 0; i < sizeofMatrix; i++)
     {
-        for (int j = 0; j < rozmiar; j++)
+        for (int j = 0; j < sizeofMatrix; j++)
         {
-            if(minimalnaMacierz[i][j] < rzad[i] && minimalnaMacierz[i][j] > -1)
+            if(minimalMatrix[i][j] < row[i] && minimalMatrix[i][j] > -1)
             {
-                rzad[i] = minimalnaMacierz[i][j];
+                row[i] = minimalMatrix[i][j];
             }
-            if(minimalnaMacierz[i][j] < kolumna[j] && minimalnaMacierz[i][j] > -1)
+            if(minimalMatrix[i][j] < column[j] && minimalMatrix[i][j] > -1)
             {
-                kolumna[j] = minimalnaMacierz[i][j];
+                column[j] = minimalMatrix[i][j];
             }
         }
     }
 
-    for(int i = 0; i < rozmiar; i++) //odjecie minimum od kazdej wartosci w macierzy
+    //odejmowanie minimum od kazdej wartosci w macierzy
+    for(int i = 0; i < sizeofMatrix; i++)
     {
-        for(int j = 0; j < rozmiar; j++)
+        for(int j = 0; j < sizeofMatrix; j++)
         {
-            if(minimalnaMacierz[i][j] != -1 && rzad[i] != -1)
+            if(minimalMatrix[i][j] != -1 && row[i] != -1)
             {
-                minimalnaMacierz[i][j] -= rzad[i];
+                minimalMatrix[i][j] -= row[i];
             }
-            if(minimalnaMacierz[i][j] != -1 && kolumna[j] != -1)
+            if(minimalMatrix[i][j] != -1 && column[j] != -1)
             {
-                minimalnaMacierz[i][j] -= kolumna[j];
+                minimalMatrix[i][j] -= column[j];
             }
         }
     }
 }
 
-int koszt(int**& minimalnaMacierz, int rozmiar)
+int cost(int**& minimalMatrix, int sizeofMatrix)  //liczenie kosztu wynikajacej z minimalizacji macierzy wezla
 {
-    int koszt = 0;
+    int cost = 0;
 
-    int rzad[rozmiar];
-    int kolumna[rozmiar];
+    int row[sizeofMatrix];
+    int column[sizeofMatrix];
 
-    minimalizacja(minimalnaMacierz, rzad, kolumna, rozmiar);
+    minimalization(minimalMatrix, row, column, sizeofMatrix);
 
-    for(int i = 0; i < rozmiar; i++)
+    for(int i = 0; i < sizeofMatrix; i++)
     {
-        if(rzad[i] != -1)
+        if(row[i] != -1)
         {
-            koszt += rzad[i];
+            cost += row[i];
         }
-        if(kolumna[i] != -1)
+        if(column[i] != -1)
         {
-            koszt += kolumna[i];
+            cost += column[i];
         }
     }
 
-    return koszt;
+    return cost;
 }
 
 
 
 void BnB::branchAndBound()
 {
-    priority_queue<Wezel*, vector<Wezel*>, porownanie> kolejka;
+    priority_queue<Node*, vector<Node*>, comparision> queueOfNodes;
 
-    vector<pair<int, int>> wektor;
+    vector<pair<int, int>> vectorofEdges;
 
-    Wezel* glowny = nowyWezel(macierzKosztow, wektor, 0, -1, 0, rozmiar);   //OBSERWOWAC!!!!
+    int counter = 0;
 
-    glowny->koszt = koszt(glowny->minimalnaMacierz, rozmiar); //obliczenie lower bound sciezki z pierwszego wezla
+    Node* first = newNode(matrixOfCost, vectorofEdges, 0, -1, 0, sizeOfMatrix);
 
-    kolejka.push(glowny); //dodanie wezla glownego do kolejki
+    first->cost = cost(first->minimalMatrix, sizeOfMatrix); //obliczenie lower bound sciezki z pierwszego wezla w kolejce
 
-    while(!kolejka.empty()) //szukanie wezlow o najnizszym koszcie - usuniecie znalezionego i dodanie ich potomkow do kolejki
+    queueOfNodes.push(first); //dodanie wezla glownego do kolejki
+
+    while(!queueOfNodes.empty() ) //szukanie wezlow o najnizszym koszcie - usuniecie znalezionego i dodanie ich potomkow do kolejki
     {
-        Wezel* minimalny = kolejka.top(); // odnalezienie wezla o najnizszym koszcie
+        Node* minimalNode = queueOfNodes.top(); // odnalezienie wezla o najnizszym koszcie
 
-        kolejka.pop(); //usuniecie wezla z kolejki
+        queueOfNodes.pop(); //usuniecie wezla z kolejki
 
-        int miasto = minimalny->wierzcholek;
+        int city = minimalNode ->vertex;    //przypisanie numeru wiercholka
 
-        if(minimalny->poziom == rozmiar - 1) //jesli odwiedzono wszystkie wierzcholki
+        if(minimalNode->level == sizeOfMatrix - 1) //jesli odwiedzono wszystkie wierzcholki
         {
-            minimalny->krawedz.push_back(make_pair(miasto,0)); //powrot do wierzcholka poczatkowego
+            int realCost = 0;
 
-            for(unsigned int i = 0; i < minimalny->krawedz.size(); i++) //wyswietlenie listy odwiedzonych wierzcholkow
+            minimalNode->edge.push_back(make_pair(city,0)); // dodanie krawedzi do wierzcholka poczatkowego
+
+            for(unsigned int i = 0; i < minimalNode->edge.size(); i++) //wyswietlenie listy odwiedzonych wierzcholkow
             {
-                cout << minimalny->krawedz[i].first + 1 << "->" << minimalny->krawedz[i].second + 1 << endl;
+                    //wypisanie kolejnych wierzcholkow w sciezce optymalnej
+                cout << minimalNode->edge[i].first << "->" << minimalNode->edge[i].second  << endl;
             }
-            cout << "Koszt sciezki: " << minimalny->koszt << endl << endl;
+            realCost = minimalNode->cost + matrixOfCost[minimalNode->edge[sizeOfMatrix-1].first][minimalNode->edge[sizeOfMatrix-1].second];
+            //realny koszt jest rowny dotychczasowemu kosztowi wezla + koszt drogi z wezla do wezla poczatkowego
+            cout << "Zminimalizowany koszt sciezki TSP  : " << minimalNode->cost << endl;
+            cout << "Rzeczywisty koszt sciezki TSP: " << realCost << endl;
+            cout << " Ilosc rozpatrzonych potomkow: " << counter << endl;
+            cout << "Wielkosc kolejki: " << queueOfNodes.size() << endl;
             return;
         }
 
-        for(int i = 0; i < rozmiar; i++) // utworzenie wezla dla kazdego potomka badanego wierzcholka
+        for(int i = 0; i < sizeOfMatrix; i++) // utworzenie wezlow dla kazdego potomka badanego wierzcholka
         {
-            if(minimalny->minimalnaMacierz[miasto][i] != -1)
+            if(minimalNode->minimalMatrix[city][i] != -1)
             {
-                Wezel* potomek = nowyWezel(minimalny->minimalnaMacierz, minimalny->krawedz, minimalny->poziom + 1, miasto, i, rozmiar);
-
-                potomek->koszt = minimalny->koszt + minimalny->minimalnaMacierz[miasto][i] + koszt(potomek->minimalnaMacierz, rozmiar);
-
-                kolejka.push(potomek);
+                Node* child = newNode(minimalNode->minimalMatrix, minimalNode->edge, minimalNode->level+ 1, city , i, sizeOfMatrix);
+                child->cost = minimalNode->cost + minimalNode->minimalMatrix[city][i] + cost(child->minimalMatrix, sizeOfMatrix);
+                //koszt potomka jest równy dotychczasowemu kosztowi wêz³a + koszt drogi z wêz³a do potomka + koszt z minimalizacji macierzy potomka
+                queueOfNodes.push(child);
+                counter++;
             }
         }
     }

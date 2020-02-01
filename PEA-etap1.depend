@@ -1,7 +1,10 @@
 # depslib dependency file v1.0
-1573476999 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\main.cpp
+1574196371 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\main.cpp
 	"tsp.h"
 	"BnB.h"
+	"Timer.h"
+	"menu.h"
+	"DP.h"
 	<iostream>
 
 1573378326 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\src\timer.cpp
@@ -10,32 +13,71 @@
 	<chrono>
 	<windows.h>
 
-1573378326 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\timer.h
+1573498325 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\timer.h
 	<iostream>
 	<ratio>
 	<ctime>
 	<chrono>
 
-1573478006 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\src\tsp.cpp
+1574190863 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\src\tsp.cpp
 	"TSP.h"
+	"Timer.h"
 	<iostream>
 	<fstream>
 	<vector>
-	"Timer.h"
 
-1573476169 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\tsp.h
+1573685692 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\tsp.h
 	<string>
 	<cstdlib>
 
-1573476009 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\src\bnb.cpp
+1574191670 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\src\bnb.cpp
 	"BnB.h"
 	<iostream>
 	"TSP.h"
 	<queue>
 	<vector>
-	<cstring>
 
-1573476696 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\bnb.h
+1573668688 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\bnb.h
 	"TSP.h"
 	<vector>
+
+1573682568 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\src\menu.cpp
+	"menu.h"
+	<iostream>
+
+1573498929 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\menu.h
+
+1573575358 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\src\wezel.cpp
+	"Wezel.h"
+	<istream>
+	<string>
+	<vector>
+	<fstream>
+
+1573575508 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\wezel.h
+	<iostream>
+	<string>
+
+1574191681 source:c:\users\krzysiek\documents\code blocks projects\pea-etap1\src\dp.cpp
+	"DP.h"
+	<vector>
+	<iostream>
+	<fstream>
+	<algorithm>
+	<string>
+	<sstream>
+	<chrono>
+	<limits.h>
+
+1573746070 c:\users\krzysiek\documents\code blocks projects\pea-etap1\include\dp.h
+	<iostream>
+	<stdio.h>
+	<algorithm>
+	<fstream>
+	<float.h>
+	<bits.h>
+	<string>
+	<conio.h>
+	<vector>
+	<math.h>
 

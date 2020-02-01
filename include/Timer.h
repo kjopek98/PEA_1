@@ -11,6 +11,7 @@ class Timer
 {
     public:
 
+
         void start();
 
         double duration();
